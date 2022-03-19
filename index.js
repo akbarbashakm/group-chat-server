@@ -1,8 +1,10 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+const http = require('http').createServer(function (req, res) {
+	res.writeHead(200, { 'Content-Type': 'text/plain' });
+	res.write('Hello World!');
+	res.end();
+})
 
-app.get('/', (req, res) => res.send('Socket Things !'));
+const io = require('socket.io')(http);
 
 io.on('connection', function (socket) {
 	let currentRoomId;
@@ -38,7 +40,7 @@ io.on('connection', function (socket) {
 		const { roomId } = args;
 		socket.join(roomId);
 		currentRoomId = roomId;
-		socket.broadcast.in(currentRoomId).emit('connectionComplete', args)
+		// socket.broadcast.in(currentRoomId).emit('connectionComplete', args)
 	});
 
 	socket.on('changeRoom', function (args) {
@@ -55,6 +57,6 @@ io.on('connection', function (socket) {
 	})
 });
 
-http.listen(process.env.port || 8080, function () {
-	console.log(`listening on ${process.env.port || 8080}`);
+http.listen(process.env.port || 3100, function () {
+	console.log(`listening on ${process.env.port || 3100}`);
 });
