@@ -1,18 +1,15 @@
-const http = require('http');
-const express = require('express');
-const app = express();
-const server = http.createServer(app);
-const io = require("socket.io")(server);
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 app.get('/', (req, res) => res.send('Socket Things !'));
 
-io.on("connection", (socket) => {
+io.on('connection', function (socket) {
+	let currentRoomId;
 
-    let currentRoomId;
-    
 	console.log(`User is Connected in`);
 
-    socket.on('test', function () {
+	socket.on('test', function () {
 		try {
 			socket.emit('testComplete', 'Cool Test')
 		} catch (e) {
@@ -33,11 +30,11 @@ io.on("connection", (socket) => {
 			// // io.of('/').adapter.remoteDisconnect(socket.id, true);
 			// socket.broadcast.in(currentRoomId).emit('disconnectComplete', socket.id)
 		} catch (e) {
-			
+
 		}
 	})
 
-    socket.on('addUser', function (args) {
+	socket.on('addUser', function (args) {
 		const { roomId } = args;
 		socket.join(roomId);
 		currentRoomId = roomId;
@@ -56,11 +53,8 @@ io.on("connection", (socket) => {
 		const { roomId } = args;
 		io.sockets.in(roomId).emit('sendMessageComplete', args)
 	})
-
 });
 
-app.io = io;
-
-server.listen(process.env.port || 3001, () => {
-    console.log("server is running on port", server.address().port);
+http.listen(process.env.port || 8080, function () {
+	console.log(`listening on ${process.env.port || 8080}`);
 });
